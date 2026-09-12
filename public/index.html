@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gerador de carrosséis — Rachel Patrocínio</title>
+<link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main class="container">
+    <h1>Gerador de carrosséis</h1>
+    <p class="subtitle">Crie o post completo em poucos cliques</p>
+
+    <section class="card">
+      <h2>1. Escolha o tema do post</h2>
+      <button id="btnSugestoes" class="btn secondary">Ver sugestões de pauta em alta</button>
+      <div id="listaSugestoes" class="sugestoes"></div>
+
+      <label for="tema">Ou digite seu próprio tema:</label>
+      <input type="text" id="tema" placeholder="Ex: novo anúncio da Havaianas com a seleção" />
+
+      <button id="btnGerar" class="btn primary">Gerar carrossel</button>
+    </section>
+
+    <section id="loading" class="card hidden">
+      <p>Gerando... isso pode levar um minuto. ⏳</p>
+    </section>
+
+    <section id="resultado" class="card hidden">
+      <h2>2. Seu carrossel</h2>
+      <p id="padraoInfo" class="padrao-info"></p>
+      <div id="slides" class="slides-grid"></div>
+
+      <h3>Legenda pronta</h3>
+      <textarea id="legenda" rows="8" readonly></textarea>
+      <button id="btnCopiarLegenda" class="btn secondary">Copiar legenda</button>
+
+      <a id="btnBaixarZip" class="btn primary" href="#" download>Baixar todas as imagens</a>
+    </section>
+
+    <section id="erro" class="card hidden erro">
+      <p id="mensagemErro"></p>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>

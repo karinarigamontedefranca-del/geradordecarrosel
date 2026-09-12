@@ -1,0 +1,138 @@
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+  background: #F4F1EC;
+  color: #2C2C2A;
+  margin: 0;
+  padding: 24px;
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 28px;
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  color: #5F5E5A;
+  margin-top: 0;
+}
+
+.card {
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.hidden { display: none; }
+
+label {
+  display: block;
+  margin-top: 16px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+input[type="text"], textarea {
+  width: 100%;
+  padding: 14px;
+  font-size: 18px;
+  border: 1px solid #D3D1C7;
+  border-radius: 10px;
+  font-family: inherit;
+}
+
+.btn {
+  display: inline-block;
+  padding: 16px 24px;
+  font-size: 18px;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 16px;
+  text-decoration: none;
+  text-align: center;
+}
+
+.btn.primary {
+  background: #443633;
+  color: #FFFFFF;
+  width: 100%;
+}
+
+.btn.secondary {
+  background: #E1CCB6;
+  color: #443633;
+}
+
+.sugestoes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.sugestao-item {
+  text-align: left;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid #D3D1C7;
+  background: #F9F7F3;
+  cursor: pointer;
+  font-size: 17px;
+}
+
+.sugestao-item:hover {
+  border-color: #CFA6A1;
+}
+
+.sugestao-item .gancho {
+  display: block;
+  color: #5F5E5A;
+  font-size: 15px;
+  margin-top: 4px;
+}
+
+.padrao-info {
+  color: #5F5E5A;
+}
+
+.slides-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.slides-grid img {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #D3D1C7;
+}
+
+.slide-wrapper {
+  position: relative;
+}
+
+.slide-alerta {
+  background: #F0997B;
+  color: #4A1B0C;
+  font-size: 13px;
+  padding: 6px;
+  border-radius: 0 0 8px 8px;
+}
+
+.erro {
+  background: #FAECE7;
+  color: #712B13;
+}
