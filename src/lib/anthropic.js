@@ -8,18 +8,43 @@ function getClient() {
   return new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 }
 
-// Extrai o primeiro bloco de texto de uma resposta da API (ignora blocos de tool use/search)
+// Pega o ÚLTIMO bloco de texto da resposta (não junta todos). Isso é importante
+// porque, ao usar a ferramenta de busca, a Claude às vezes escreve uma frase
+// de narração ANTES de buscar (ex: "Vou pesquisar sobre...") — essa frase vem
+// num bloco de texto separado do bloco final com a resposta de verdade.
+// Juntar tudo quebraria o JSON; pegar só o último bloco evita isso.
 function extractText(message) {
-  return message.content
-    .filter((block) => block.type === 'text')
-    .map((block) => block.text)
-    .join('\n');
+  const textBlocks = message.content.filter((block) => block.type === 'text');
+  if (textBlocks.length === 0) return '';
+  return textBlocks[textBlocks.length - 1].text;
 }
 
-// Tenta limpar e parsear JSON mesmo se vier com ```json ... ``` em volta
+// Tenta limpar e parsear JSON mesmo se vier com ```json ... ``` em volta ou
+// com alguma frase antes/depois do JSON (rede de segurança extra, além da
+// instrução no prompt para não narrar nada).
 function parseJsonSafe(text) {
   const cleaned = text.replace(/```json/g, '').replace(/```/g, '').trim();
-  return JSON.parse(cleaned);
+
+  try {
+    return JSON.parse(cleaned);
+  } catch (firstError) {
+    // Plano B: extrai só o trecho entre o primeiro '{' ou '[' e o último
+    // '}' ou ']' correspondente, ignorando qualquer texto solto ao redor.
+    const firstBrace = cleaned.indexOf('{');
+    const firstBracket = cleaned.indexOf('[');
+    const starts = [firstBrace, firstBracket].filter((i) => i !== -1);
+
+    if (starts.length === 0) throw firstError;
+
+    const start = Math.min(...starts);
+    const isArray = cleaned[start] === '[';
+    const end = isArray ? cleaned.lastIndexOf(']') : cleaned.lastIndexOf('}');
+
+    if (end === -1 || end < start) throw firstError;
+
+    const extracted = cleaned.slice(start, end + 1);
+    return JSON.parse(extracted); // se ainda falhar aqui, o erro sobe pra quem chamou
+  }
 }
 
 /**
@@ -39,6 +64,9 @@ marcas famosas fazendo algo notável, moda, e inovações/notícias de marketing
 SOMENTE os 5 temas mais interessantes para ensinar um conceito de branding/marketing/
 posicionamento — descarte tudo que seja fofoca vazia, polêmica sem relação com marca, ou
 raso demais para virar um post estratégico.
+IMPORTANTE: não escreva nenhuma frase de narração antes de pesquisar (ex: "vou
+buscar...") nem nenhum comentário depois. Sua resposta final deve conter
+SOMENTE o JSON abaixo, nada de texto antes ou depois dele.
 Responda SOMENTE em JSON válido, sem markdown, neste formato:
 [
   { "titulo": "resumo curto do tema", "gancho_branding": "qual conceito de branding esse tema evidencia, em 1 frase", "fonte": "de onde veio a info" }

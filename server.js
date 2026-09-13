@@ -15,6 +15,7 @@ fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/output', express.static(OUTPUT_DIR));
+app.use('/fonts', express.static(path.join(__dirname, 'fonts')));
 
 app.use('/api', suggestionsRoute);
 app.use('/api', generateRoute);

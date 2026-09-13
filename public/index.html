@@ -7,41 +7,91 @@
 <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-  <main class="container">
-    <h1>Gerador de carrosséis</h1>
-    <p class="subtitle">Crie o post completo em poucos cliques</p>
+  <div class="page">
 
-    <section class="card">
-      <h2>1. Escolha o tema do post</h2>
-      <button id="btnSugestoes" class="btn secondary">Ver sugestões de pauta em alta</button>
-      <div id="listaSugestoes" class="sugestoes"></div>
+    <header class="brand">
+      <span class="brand__mark">Rachel Patrocínio</span>
+      <span class="brand__sub">gerador de carrosséis</span>
+    </header>
 
-      <label for="tema">Ou digite seu próprio tema:</label>
-      <input type="text" id="tema" placeholder="Ex: novo anúncio da Havaianas com a seleção" />
+    <nav class="tracker" aria-label="Etapas">
+      <button class="tracker__step" data-step="1" type="button">Tema</button>
+      <span class="tracker__rule"></span>
+      <button class="tracker__step" data-step="2" type="button">Post</button>
+      <span class="tracker__rule"></span>
+      <button class="tracker__step" data-step="3" type="button">Legenda</button>
+      <span class="tracker__rule"></span>
+      <button class="tracker__step" data-step="4" type="button">Baixar</button>
+    </nav>
 
-      <button id="btnGerar" class="btn primary">Gerar carrossel</button>
-    </section>
+    <main class="stage-area">
 
-    <section id="loading" class="card hidden">
-      <p>Gerando... isso pode levar um minuto. ⏳</p>
-    </section>
+      <!-- ETAPA 1 — TEMA -->
+      <section class="stage" id="stage-1" data-active="true">
+        <h1>Escolha o tema do post</h1>
+        <p class="lead">Veja o que está em alta agora, ou parta direto de uma ideia sua.</p>
 
-    <section id="resultado" class="card hidden">
-      <h2>2. Seu carrossel</h2>
-      <p id="padraoInfo" class="padrao-info"></p>
-      <div id="slides" class="slides-grid"></div>
+        <button id="btnSugestoes" class="btn btn--ghost">Ver sugestões em alta</button>
 
-      <h3>Legenda pronta</h3>
-      <textarea id="legenda" rows="8" readonly></textarea>
-      <button id="btnCopiarLegenda" class="btn secondary">Copiar legenda</button>
+        <div id="listaSugestoes" class="suggestions"></div>
 
-      <a id="btnBaixarZip" class="btn primary" href="#" download>Baixar todas as imagens</a>
-    </section>
+        <div class="divider"><span>ou</span></div>
 
-    <section id="erro" class="card hidden erro">
-      <p id="mensagemErro"></p>
-    </section>
-  </main>
+        <label for="tema">Já tenho uma ideia em mente</label>
+        <input type="text" id="tema" placeholder="Ex: novo anúncio da Havaianas com a seleção" />
+
+        <button id="btnGerar" class="btn btn--primary">Gerar post</button>
+      </section>
+
+      <!-- ETAPA 2 — POST -->
+      <section class="stage" id="stage-2" data-active="false">
+        <h1>Seu post está pronto</h1>
+        <p class="lead" id="padraoInfo"></p>
+
+        <div id="loadingPost" class="loading hidden">
+          <p>Escrevendo e desenhando os slides... isso leva cerca de um minuto.</p>
+        </div>
+
+        <div id="slides" class="slides-grid"></div>
+
+        <button id="btnParaLegenda" class="btn btn--primary">Continuar para a legenda</button>
+      </section>
+
+      <!-- ETAPA 3 — LEGENDA -->
+      <section class="stage" id="stage-3" data-active="false">
+        <h1>Escreva a legenda</h1>
+        <p class="lead">Use a legenda que a IA escreveu, ou substitua pela sua.</p>
+
+        <div class="caption-toggle">
+          <button id="btnLegendaAuto" class="chip chip--active" type="button">Legenda automática</button>
+          <button id="btnLegendaManual" class="chip" type="button">Escrever a minha</button>
+        </div>
+
+        <textarea id="legenda" rows="10"></textarea>
+
+        <button id="btnParaBaixar" class="btn btn--primary">Continuar para baixar</button>
+      </section>
+
+      <!-- ETAPA 4 — BAIXAR -->
+      <section class="stage" id="stage-4" data-active="false">
+        <h1>Baixe o post</h1>
+        <p class="lead">Escolha o formato — os dois trazem os slides e a legenda escolhida.</p>
+
+        <div class="download-options">
+          <a id="btnBaixarPdf" class="btn btn--primary" href="#" download>Baixar em PDF</a>
+          <a id="btnBaixarZip" class="btn btn--ghost" href="#" download>Baixar em ZIP</a>
+        </div>
+
+        <button id="btnCopiarLegenda" class="btn btn--text">Copiar legenda</button>
+        <button id="btnNovoPost" class="btn btn--text">Começar um novo post</button>
+      </section>
+
+      <div id="erro" class="erro hidden">
+        <p id="mensagemErro"></p>
+      </div>
+
+    </main>
+  </div>
 
   <script src="/app.js"></script>
 </body>

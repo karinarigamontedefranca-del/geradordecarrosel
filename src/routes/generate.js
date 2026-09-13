@@ -82,6 +82,16 @@ router.post('/generate', async (req, res) => {
   }
 });
 
+router.post('/legenda/:jobId', (req, res) => {
+  const jobDir = path.join(OUTPUT_DIR, req.params.jobId);
+  if (!fs.existsSync(jobDir)) {
+    return res.status(404).json({ ok: false, error: 'Carrossel não encontrado.' });
+  }
+  const { caption } = req.body;
+  fs.writeFileSync(path.join(jobDir, 'legenda.txt'), caption || '', 'utf-8');
+  res.json({ ok: true });
+});
+
 router.get('/download/:jobId', (req, res) => {
   const jobDir = path.join(OUTPUT_DIR, req.params.jobId);
   if (!fs.existsSync(jobDir)) {
@@ -93,6 +103,38 @@ router.get('/download/:jobId', (req, res) => {
   archive.pipe(res);
   archive.directory(jobDir, false);
   archive.finalize();
+});
+
+router.get('/download/:jobId/pdf', async (req, res) => {
+  const jobDir = path.join(OUTPUT_DIR, req.params.jobId);
+  if (!fs.existsSync(jobDir)) {
+    return res.status(404).json({ ok: false, error: 'Carrossel não encontrado.' });
+  }
+
+  try {
+    const { PDFDocument } = require('pdf-lib');
+    const pdfDoc = await PDFDocument.create();
+
+    const files = fs
+      .readdirSync(jobDir)
+      .filter((f) => f.endsWith('.png'))
+      .sort();
+
+    for (const file of files) {
+      const imageBytes = fs.readFileSync(path.join(jobDir, file));
+      const image = await pdfDoc.embedPng(imageBytes);
+      const page = pdfDoc.addPage([image.width, image.height]);
+      page.drawImage(image, { x: 0, y: 0, width: image.width, height: image.height });
+    }
+
+    const pdfBytes = await pdfDoc.save();
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${req.params.jobId}.pdf"`);
+    res.send(Buffer.from(pdfBytes));
+  } catch (err) {
+    console.error('Erro ao montar PDF:', err);
+    res.status(500).json({ ok: false, error: err.message });
+  }
 });
 
 module.exports = router;
