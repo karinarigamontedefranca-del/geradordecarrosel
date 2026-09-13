@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Biblioteca — Rachel Patrocínio</title>
+<link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="page">
+
+    <header class="brand">
+      <span class="brand__mark">Rachel Patrocínio</span>
+      <span class="brand__sub">biblioteca de posts</span>
+    </header>
+
+    <p class="lead" style="text-align:center; margin-bottom: 32px;">
+      <a href="/" class="btn--text" style="text-decoration:underline;">Voltar ao gerador</a>
+    </p>
+
+    <main>
+      <div id="carregando" class="loading">
+        <p>Carregando os posts salvos...</p>
+      </div>
+
+      <div id="semConfiguracao" class="erro hidden">
+        <p>A biblioteca ainda não está configurada. Adicione <code>SUPABASE_URL</code> e
+        <code>SUPABASE_SERVICE_KEY</code> nas variáveis de ambiente para ativar o histórico
+        permanente de posts.</p>
+      </div>
+
+      <div id="vazio" class="hidden">
+        <p class="lead">Nenhum post salvo ainda. Gere o primeiro pelo gerador.</p>
+      </div>
+
+      <div id="lista" class="library-grid"></div>
+    </main>
+
+  </div>
+
+  <script src="/biblioteca.js"></script>
+</body>
+</html>

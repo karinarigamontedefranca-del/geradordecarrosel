@@ -67,6 +67,59 @@ body {
   margin-top: 2px;
 }
 
+.brand__link {
+  display: inline-block;
+  margin-top: 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ---------- Biblioteca ---------- */
+
+.library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.library-card {
+  border: 1px solid var(--sand);
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.library-card img {
+  width: 100%;
+  aspect-ratio: 1080 / 1350;
+  object-fit: cover;
+  display: block;
+}
+
+.library-card__body { padding: 14px 16px; }
+
+.library-card__tema {
+  font-weight: 700;
+  font-size: 15px;
+  margin: 0 0 4px;
+}
+
+.library-card__meta {
+  font-size: 13px;
+  opacity: 0.65;
+  margin: 0 0 10px;
+}
+
+.library-card__actions {
+  display: flex;
+  gap: 16px;
+}
+
+.library-card__actions a { font-size: 14px; }
+
 /* ---------- Trilha de progresso ---------- */
 
 .tracker {
