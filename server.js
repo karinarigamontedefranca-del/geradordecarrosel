@@ -23,7 +23,7 @@ app.get('/api/health', (req, res) => {
   res.json({
     ok: true,
     anthropicConfigured: Boolean(process.env.ANTHROPIC_API_KEY),
-    geminiConfigured: Boolean(process.env.GEMINI_API_KEY),
+    openaiConfigured: Boolean(process.env.OPENAI_API_KEY),
   });
 });
 

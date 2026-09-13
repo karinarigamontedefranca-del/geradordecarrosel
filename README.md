@@ -2,8 +2,8 @@
 
 Sistema que gera carrosséis de Instagram completos (texto + design + legenda)
 no estilo da Rachel, a partir de um tema — usando a API da Anthropic (Claude)
-para decidir o padrão/redigir/desenhar cada slide em código, e a API da Gemini
-para gerar fotos de fundo quando necessário.
+para decidir o padrão/redigir/desenhar cada slide em código, e a API de imagens
+da OpenAI (GPT Image) para gerar fotos de fundo quando necessário.
 
 ## Como rodar (primeiro teste, no seu computador)
 
@@ -21,7 +21,7 @@ Copie o arquivo `.env.example` e renomeie a cópia para `.env`. Abra o `.env`
 e cole suas chaves:
 ```
 ANTHROPIC_API_KEY=sua_chave_aqui
-GEMINI_API_KEY=sua_chave_aqui
+OPENAI_API_KEY=sua_chave_aqui
 ```
 
 ### 4. Adicionar as fontes da marca
@@ -40,14 +40,14 @@ vai usar.
 O motor de renderização (que transforma o código gerado pela IA em imagem
 PNG) já foi testado e funciona corretamente — veja `output/teste.png` de
 exemplo. O que falta testar é a geração real com sua chave (texto da Claude +
-fotos da Gemini), que só funciona com as chaves de API válidas.
+fotos da OpenAI), que só funciona com as chaves de API válidas.
 
 ## Estrutura do projeto
 ```
 server.js                  → servidor principal
 src/prompts/masterPrompt.js → todas as regras de DNA e marca (edite aqui para ajustar tom/regras)
 src/lib/anthropic.js        → chamadas à API da Claude (sugestões + geração do carrossel)
-src/lib/gemini.js           → chamada à API da Gemini (fotos de fundo)
+src/lib/openai.js           → chamada à API de imagens da OpenAI (fotos de fundo)
 src/lib/renderSlide.js      → motor que transforma o SVG gerado em imagem PNG
 src/routes/                 → rotas do servidor (/api/suggestions, /api/generate, /api/download)
 public/                     → interface visual (HTML/CSS/JS) que a Rachel usa
@@ -58,7 +58,7 @@ output/                     → carrosséis gerados (cada um em uma subpasta com
 ## Sobre pessoas famosas reais (importante)
 Quando o tema envolve uma pessoa pública identificável (ex: um atleta, um
 CEO, uma celebridade), o sistema NÃO gera a foto dela por IA — isso é
-proibido pelas políticas da Anthropic e da Google, além de risco de direito
+proibido pelas políticas da Anthropic e da OpenAI, além de risco de direito
 de imagem. Nesses casos, o slide aparece com um aviso na interface dizendo
 qual foto a Rachel precisa inserir manualmente (uma foto de imprensa, por
 exemplo), e o texto/layout ao redor já vem pronto.

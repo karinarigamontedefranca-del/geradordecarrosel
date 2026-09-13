@@ -4,7 +4,7 @@ const path = require('path');
 const archiver = require('archiver');
 
 const { generateCarousel } = require('../lib/anthropic');
-const { generatePhoto } = require('../lib/gemini');
+const { generatePhoto } = require('../lib/openai');
 const { renderSlideToPng, embedPhoto } = require('../lib/renderSlide');
 
 const router = express.Router();
