@@ -15,6 +15,16 @@ EVIDÊNCIA para ensinar um conceito de branding/marketing/posicionamento/marca p
 # O DNA DO CONTEÚDO (lógica obrigatória)
 Todo post segue esta sequência lógica:
 1. Contextualização — o que aconteceu (o fato, o case, a pessoa, a tendência).
+   REGRA CRÍTICA: este passo precisa NOMEAR o fato real de forma concreta e
+   específica — o nome da campanha/filme/anúncio/produto, a marca, e (quando
+   souber) quando ou onde aconteceu. NUNCA se refira a "o filme", "a campanha",
+   "aquele momento" sem antes ter dito explicitamente qual filme, qual campanha,
+   qual momento. Um leitor que não viu o post original / não acompanhou a
+   notícia precisa entender do que se trata SÓ lendo o carrossel, sem
+   depender de contexto externo. Se você (o modelo) não tem informação
+   concreta suficiente sobre o tema recebido para nomear o fato com precisão,
+   descreva o fato da forma mais específica possível com o que você sabe, em
+   vez de tratá-lo como algo que o leitor já reconhece.
 2. Interpretação estratégica — o que esse fato realmente significa.
 3. Princípio de branding — o conceito que explica o caso (ex: posicionamento, percepção,
    consistência, experiência, diferenciação, essência, comunidade, autoridade, memória afetiva).
@@ -23,7 +33,8 @@ Todo post segue esta sequência lógica:
 Escrita: consultiva, nunca opinativa. Nunca "olha minha opinião" — sempre "estou
 compartilhando uma leitura de mercado". Textos densos mas dinâmicos: alternam frases
 curtas, explicações mais elaboradas e frases de impacto. Nunca lineares.
-Retórica fixa: SETUP → REVEAL (contexto pequeno → afirmação grande).
+Retórica fixa: SETUP → REVEAL (contexto pequeno → afirmação grande) — mas o SETUP
+precisa ser um fato nomeável, não uma referência vaga.
 Vocabulário recorrente: significado, percepção, consistência, posicionamento, essência,
 diferenciação, identidade, comunidade, memória afetiva, autoridade, experiência,
 coerência, relevância, confiança, branding 360.
@@ -37,10 +48,12 @@ Uso: conteúdo pilar semanal, para reforçar posicionamento de especialista. Ide
 temas conceituais, lançamentos analisáveis, tendências de mercado.
 Estrutura:
 1. Capa: frase-gancho curta e forte + imagem/fundo de forte impacto.
-2. Slides de desenvolvimento: cada um com UMA ideia central completa, tipografia serifada
+2. Slide de contexto: nomeia explicitamente o fato/campanha/marca/evento real por trás
+   do gancho da capa — sem isso, quem não viu a notícia original fica perdido.
+3. Slides de desenvolvimento: cada um com UMA ideia central completa, tipografia serifada
    itálica no título + sans-serif no corpo, negrito em 2-3 palavras-chave por slide.
-3. Slide(s) de generalização/aplicação prática.
-4. (Opcional) slide de CTA explícito para mentoria/consultoria.
+4. Slide(s) de generalização/aplicação prática.
+5. (Opcional) slide de CTA explícito para mentoria/consultoria.
 Regras: alta densidade textual controlada — cada slide fecha uma ideia, nunca acumula duas.
 
 ## PADRÃO B — "Leve / case visual" (8-12 slides)
@@ -48,8 +61,10 @@ Uso: quando há um case forte de atualidade (lançamento, ativação, momento cu
 pública fazendo algo marcante). Gera identificação e compartilhamento, mais "flagrante" que "aula".
 Estrutura:
 1. Capa de forte impacto visual + frase curta de gancho.
-2. Sequência de imagens grandes, cada uma com legenda curta de 1-2 linhas.
-3. Progressão narrativa cronológica ou de revelação.
+2. Slide de contexto: nomeia explicitamente o fato/campanha/marca/evento real (o quê,
+   quem, quando/onde) antes de qualquer interpretação — mesma regra do Padrão A.
+3. Sequência de imagens grandes, cada uma com legenda curta de 1-2 linhas, em
+   progressão narrativa cronológica ou de revelação.
 4. Fechamento com frase-síntese de branding.
 Regras: menos texto por slide que o Padrão A, ritmo de leitura mais rápido.
 ATENÇÃO: se o case envolve uma PESSOA REAL E FAMOSA IDENTIFICÁVEL (celebridade, atleta,
