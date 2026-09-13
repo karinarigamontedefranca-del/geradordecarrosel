@@ -78,9 +78,10 @@ router.post('/generate', async (req, res) => {
     const jobDir = path.join(OUTPUT_DIR, jobId);
     fs.mkdirSync(jobDir, { recursive: true });
 
-    // Gera a foto de cada slide (quando precisar) em PARALELO, não em sequência,
-    // e já aproveita para enviar cada PNG pro Supabase (biblioteca permanente)
-    // ao mesmo tempo que salva no disco local.
+    // Gera a foto de cada slide (quando precisar) em PARALELO, não em sequência.
+    // IMPORTANTE: aqui só usamos Claude + OpenAI + disco local — nada de
+    // Supabase nesse caminho. Assim, mesmo que o Supabase esteja lento, com
+    // chave errada, ou fora do ar, o post ainda aparece pra Rachel normalmente.
     const slidesOut = await Promise.all(
       carousel.slides.map(async (slide) => {
         const photoBuffer = await resolvePhotoBuffer(slide);
@@ -90,18 +91,9 @@ router.post('/generate', async (req, res) => {
         const fileName = `slide-${String(slide.index).padStart(2, '0')}.png`;
         fs.writeFileSync(path.join(jobDir, fileName), pngBuffer);
 
-        let imageUrl = `/output/${jobId}/${fileName}`;
-        if (supabase.isConfigured()) {
-          try {
-            imageUrl = await supabase.uploadSlide(jobId, fileName, pngBuffer);
-          } catch (err) {
-            console.warn(`Não consegui salvar o slide ${slide.index} na biblioteca:`, err.message);
-          }
-        }
-
         return {
           index: slide.index,
-          imageUrl,
+          imageUrl: `/output/${jobId}/${fileName}`,
           photo_description: slide.photo_description || null,
         };
       })
@@ -113,21 +105,8 @@ router.post('/generate', async (req, res) => {
 
     fs.writeFileSync(path.join(jobDir, 'legenda.txt'), carousel.caption || '', 'utf-8');
 
-    if (supabase.isConfigured()) {
-      try {
-        await supabase.savePost({
-          id: jobId,
-          tema,
-          pattern: carousel.pattern,
-          caption: carousel.caption || '',
-          created_at: new Date().toISOString(),
-          slides: slidesOut,
-        });
-      } catch (err) {
-        console.warn('Não consegui salvar o post na biblioteca:', err.message);
-      }
-    }
-
+    // Envia a resposta AGORA — o resto (salvar na biblioteca) acontece depois,
+    // sem o navegador da Rachel esperar por isso.
     res.json({
       ok: true,
       jobId,
@@ -135,11 +114,40 @@ router.post('/generate', async (req, res) => {
       caption: carousel.caption,
       slides: slidesOut,
     });
+
+    // A partir daqui, nada mais é "await"-ado pela requisição: é só um
+    // processo em segundo plano. Se falhar, só fica de fora da biblioteca —
+    // não afeta o post que a Rachel já está vendo na tela.
+    salvarNaBiblioteca({ jobId, jobDir, tema, carousel, slidesOut }).catch((err) => {
+      console.warn('Não consegui salvar este post na biblioteca:', err.message);
+    });
   } catch (err) {
     console.error('Erro em /api/generate:', err);
     res.status(500).json({ ok: false, error: err.message });
   }
 });
+
+async function salvarNaBiblioteca({ jobId, jobDir, tema, carousel, slidesOut }) {
+  if (!supabase.isConfigured()) return;
+
+  const slidesComUrlPermanente = await Promise.all(
+    slidesOut.map(async (slide) => {
+      const fileName = `slide-${String(slide.index).padStart(2, '0')}.png`;
+      const buffer = fs.readFileSync(path.join(jobDir, fileName));
+      const urlPermanente = await supabase.uploadSlide(jobId, fileName, buffer);
+      return { ...slide, imageUrl: urlPermanente };
+    })
+  );
+
+  await supabase.savePost({
+    id: jobId,
+    tema,
+    pattern: carousel.pattern,
+    caption: carousel.caption || '',
+    created_at: new Date().toISOString(),
+    slides: slidesComUrlPermanente,
+  });
+}
 
 router.post('/legenda/:jobId', async (req, res) => {
   const { jobId } = req.params;
