@@ -112,7 +112,7 @@ async function generateCarousel(tema) {
 
   const message = await client.messages.create({
     model: 'claude-sonnet-4-5',
-    max_tokens: 8000,
+    max_tokens: 16000,
     system: MASTER_SYSTEM_PROMPT,
     messages: [
       {
@@ -121,6 +121,18 @@ async function generateCarousel(tema) {
       },
     ],
   });
+
+  // Se a resposta foi cortada por bater no limite de tokens, o JSON vem
+  // incompleto e o parse abaixo ia falhar com uma mensagem confusa ("Unexpected
+  // end of JSON input"). Detectamos isso aqui e damos um erro claro — porque
+  // esse é o sintoma exato de "gastei tokens e não saiu post nenhum".
+  if (message.stop_reason === 'max_tokens') {
+    throw new Error(
+      'A resposta da Claude foi cortada por ser grande demais (carrossel com muitos slides ' +
+      'ou texto muito detalhado). Tente novamente — em geral funciona na segunda tentativa — ' +
+      'ou peça um tema um pouco mais simples/direto.'
+    );
+  }
 
   const text = extractText(message);
   return parseJsonSafe(text);

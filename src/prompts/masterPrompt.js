@@ -102,7 +102,11 @@ dourada/dessaturada.
   Porque as pessoas não lembram de Z."), cada uma dessas frases vira o SEU PRÓPRIO
   slide — nunca fique empilhando frases curtas separadas por respiro vertical dentro
   do mesmo slide, mesmo que pareça "leve". Prefira gerar 1-2 slides A MAIS do que
-  comprimir ideias demais numa peça só.
+  comprimir ideias demais numa peça só — mas respeitando o LIMITE MÁXIMO de 12 slides
+  no total (Padrão A e B). Se o tema tem material para mais que isso, corte para os
+  pontos mais fortes em vez de tentar caber tudo — carrossel longo demais também é
+  pior experiência de leitura, e reduz a chance de a resposta ser cortada por limite
+  de tamanho antes de terminar.
 - Tagline fixa no rodapé de todo slide do Padrão A e B (curta, ex: "Marketing também é
   sobre [conceito]" ou equivalente ao tema do post) — com 1-2 palavras em negrito.
 - Fechamento com função clara: cada peça termina sabendo o que quer do leitor — refletir
