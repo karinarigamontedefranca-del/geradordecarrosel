@@ -120,6 +120,100 @@ body {
 
 .library-card__actions a { font-size: 14px; }
 
+.topics-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.topic-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--sand);
+  border-radius: 4px;
+  background: var(--surface);
+}
+
+.topic-item__titulo {
+  font-weight: 700;
+  font-size: 15px;
+  margin: 0 0 4px;
+}
+
+.topic-item__gancho {
+  font-size: 13px;
+  opacity: 0.65;
+  margin: 0;
+}
+
+.topic-badge {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--sand);
+  color: var(--ink);
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+.topic-badge--used {
+  background: var(--gold);
+  opacity: 1;
+  border-color: transparent;
+}
+
+/* ---------- Edição de post ---------- */
+
+.edit-slides-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 24px;
+}
+
+.edit-slide-card {
+  border: 1px solid var(--sand);
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--surface);
+  padding-bottom: 12px;
+}
+
+.edit-slide-card__img {
+  width: 100%;
+  aspect-ratio: 1080 / 1350;
+  object-fit: cover;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.edit-slide-card__toggle {
+  display: block;
+  margin: 0 auto;
+  font-size: 13px;
+}
+
+.edit-slide-card__options {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 8px;
+  padding: 0 10px;
+  flex-wrap: wrap;
+}
+
+.edit-slide-card__status {
+  text-align: center;
+  font-size: 12px;
+  opacity: 0.7;
+  margin: 8px 0 0;
+  min-height: 14px;
+}
+
 /* ---------- Trilha de progresso ---------- */
 
 .tracker {

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Editar post — Rachel Patrocínio</title>
+<link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="page">
+
+    <header class="brand">
+      <span class="brand__mark">Rachel Patrocínio</span>
+      <span class="brand__sub">editar post</span>
+      <a href="/biblioteca.html" class="brand__link">Voltar à biblioteca</a>
+    </header>
+
+    <main>
+      <div id="carregando" class="loading">
+        <p>Carregando o post...</p>
+      </div>
+
+      <div id="erro" class="erro hidden">
+        <p id="mensagemErro"></p>
+      </div>
+
+      <div id="conteudo" class="hidden">
+        <h1 id="tituloPost"></h1>
+        <p class="lead" id="metaPost"></p>
+
+        <div id="slides" class="edit-slides-grid"></div>
+
+        <div class="download-options" style="margin-top: 40px;">
+          <a id="btnBaixarPdf" class="btn btn--primary" href="#" download>Baixar em PDF</a>
+          <a id="btnBaixarZip" class="btn btn--ghost" href="#" download>Baixar em ZIP</a>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <script src="/post.js"></script>
+</body>
+</html>

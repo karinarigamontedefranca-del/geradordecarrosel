@@ -15,7 +15,7 @@ problema que resolvemos com isso).
 Vá em [supabase.com](https://supabase.com), crie uma conta grátis e um novo
 projeto. Anote a senha do banco que você definir.
 
-### 2. Criar a tabela de posts
+### 2. Criar as tabelas
 No painel do Supabase, vá em **SQL Editor** → **New query**, cole e rode:
 ```sql
 create table posts (
@@ -26,7 +26,20 @@ create table posts (
   created_at timestamptz default now(),
   slides jsonb
 );
+alter table posts enable row level security;
+
+create table temas (
+  id text primary key,
+  titulo text not null,
+  gancho_branding text,
+  fonte text,
+  created_at timestamptz default now(),
+  used_at timestamptz
+);
+alter table temas enable row level security;
 ```
+(O `enable row level security` fecha as tabelas pra qualquer chave que não seja
+a `secret` — o nosso servidor usa a `secret`, então continua funcionando normal.)
 
 ### 3. Criar o espaço de armazenamento das imagens
 No painel, vá em **Storage** → **New bucket**. Nome: `carrosseis`. Marque

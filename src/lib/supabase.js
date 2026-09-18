@@ -101,6 +101,88 @@ async function getPost(jobId) {
   return data;
 }
 
+/**
+ * Salva uma leva de temas sugeridos na biblioteca (tabela "temas"). Cada tema
+ * recebe um id próprio, baseado no horário, pra nunca colidir.
+ */
+async function saveTopics(topics) {
+  const supabase = getClient();
+  const rows = topics.map((t, i) => ({
+    id: `tema-${Date.now()}-${i}`,
+    titulo: t.titulo,
+    gancho_branding: t.gancho_branding || null,
+    fonte: t.fonte || null,
+    created_at: new Date().toISOString(),
+    used_at: null,
+  }));
+  const { error } = await supabase.from('temas').insert(rows);
+  if (error) throw new Error(`Falha ao salvar temas no Supabase: ${error.message}`);
+}
+
+/**
+ * Lista os títulos de temas sugeridos nos últimos N dias — usado pra instruir
+ * a Claude a não repetir a mesma sugestão de uma busca pra outra.
+ */
+async function listRecentTopicTitles(daysBack = 14) {
+  const supabase = getClient();
+  const since = new Date(Date.now() - daysBack * 24 * 60 * 60 * 1000).toISOString();
+
+  const { data, error } = await supabase
+    .from('temas')
+    .select('titulo')
+    .gte('created_at', since)
+    .order('created_at', { ascending: false });
+
+  if (error) throw new Error(`Falha ao listar temas recentes do Supabase: ${error.message}`);
+  return data.map((row) => row.titulo);
+}
+
+/**
+ * Lista os temas salvos (biblioteca completa), do mais recente pro mais antigo
+ * — usado na página da biblioteca.
+ */
+async function listTopics() {
+  const supabase = getClient();
+  const { data, error } = await supabase
+    .from('temas')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) throw new Error(`Falha ao listar temas do Supabase: ${error.message}`);
+  return data;
+}
+
+/**
+ * Marca um tema como "já usado" quando ele vira um post de verdade — assim
+ * ele para de ser sugerido de novo e fica marcado no histórico.
+ */
+async function markTopicUsed(titulo) {
+  const supabase = getClient();
+  const { error } = await supabase
+    .from('temas')
+    .update({ used_at: new Date().toISOString() })
+    .eq('titulo', titulo)
+    .is('used_at', null);
+  if (error) throw new Error(`Falha ao marcar tema como usado no Supabase: ${error.message}`);
+}
+
+/**
+ * Substitui os dados de UM slide específico dentro de um post já salvo
+ * (usado ao editar a imagem de fundo — upload manual ou nova geração por IA).
+ */
+async function updatePostSlide(jobId, slideIndex, patch) {
+  const supabase = getClient();
+  const post = await getPost(jobId);
+
+  const novosSlides = post.slides.map((slide) =>
+    slide.index === slideIndex ? { ...slide, ...patch } : slide
+  );
+
+  const { error } = await supabase.from('posts').update({ slides: novosSlides }).eq('id', jobId);
+  if (error) throw new Error(`Falha ao atualizar o slide no Supabase: ${error.message}`);
+
+  return novosSlides.find((s) => s.index === slideIndex);
+}
+
 module.exports = {
   isConfigured,
   uploadSlide,
@@ -109,4 +191,9 @@ module.exports = {
   updateCaption,
   listPosts,
   getPost,
+  updatePostSlide,
+  saveTopics,
+  listRecentTopicTitles,
+  listTopics,
+  markTopicUsed,
 };

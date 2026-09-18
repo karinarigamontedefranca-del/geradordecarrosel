@@ -2,6 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const archiver = require('archiver');
+const multer = require('multer');
 
 const { generateCarousel } = require('../lib/anthropic');
 const { generatePhoto } = require('../lib/openai');
@@ -10,6 +11,19 @@ const supabase = require('../lib/supabase');
 
 const router = express.Router();
 const OUTPUT_DIR = path.join(__dirname, '..', '..', 'output');
+
+// Upload de imagem guardado só na memória (não precisa gravar em disco) —
+// limite de 8MB, só imagens.
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 8 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (!file.mimetype.startsWith('image/')) {
+      return cb(new Error('O arquivo precisa ser uma imagem.'));
+    }
+    cb(null, true);
+  },
+});
 
 // Fundo neutro usado quando o slide precisa de uma foto REAL (pessoa famosa)
 // que a Rachel vai inserir manualmente depois, ou quando a geração de foto falha.
@@ -95,6 +109,10 @@ router.post('/generate', async (req, res) => {
           index: slide.index,
           imageUrl: `/output/${jobId}/${fileName}`,
           photo_description: slide.photo_description || null,
+          // Guardamos o "molde" (SVG original, ainda com {{PHOTO}}) e o prompt
+          // usado na foto — sem isso, não dá pra editar a imagem de fundo depois.
+          svg: slide.svg,
+          photo_prompt: slide.photo_prompt || null,
         };
       })
     );
@@ -121,6 +139,12 @@ router.post('/generate', async (req, res) => {
     salvarNaBiblioteca({ jobId, jobDir, tema, carousel, slidesOut }).catch((err) => {
       console.warn('Não consegui salvar este post na biblioteca:', err.message);
     });
+
+    if (supabase.isConfigured()) {
+      supabase.markTopicUsed(tema).catch((err) => {
+        console.warn('Não consegui marcar o tema como usado:', err.message);
+      });
+    }
   } catch (err) {
     console.error('Erro em /api/generate:', err);
     res.status(500).json({ ok: false, error: err.message });
@@ -196,6 +220,108 @@ router.get('/biblioteca/:jobId', async (req, res) => {
     res.json({ ok: true, post });
   } catch (err) {
     res.status(404).json({ ok: false, error: err.message });
+  }
+});
+
+router.get('/temas', async (req, res) => {
+  if (!supabase.isConfigured()) {
+    return res.status(400).json({
+      ok: false,
+      error: 'A biblioteca de temas não está configurada ainda (faltam SUPABASE_URL e SUPABASE_SERVICE_KEY).',
+    });
+  }
+  try {
+    const temas = await supabase.listTopics();
+    res.json({ ok: true, temas });
+  } catch (err) {
+    console.error('Erro em /api/temas:', err);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// ---------- Editar a imagem de fundo de um slide já salvo ----------
+
+function precisaEstarConfigurado(res) {
+  if (!supabase.isConfigured()) {
+    res.status(400).json({ ok: false, error: 'A biblioteca não está configurada ainda.' });
+    return false;
+  }
+  return true;
+}
+
+async function renderizarESalvarSlide({ jobId, slide, photoBuffer }) {
+  if (!slide.svg || !slide.svg.includes('{{PHOTO}}')) {
+    throw new Error('Este slide não tem uma foto de fundo pra editar (é um slide só de texto).');
+  }
+
+  const finalSvg = embedPhoto(slide.svg, photoBuffer);
+  const pngBuffer = renderSlideToPng(finalSvg);
+
+  // Nome de arquivo novo a cada edição (com timestamp), pra garantir que o
+  // link da imagem mude e não fique preso num cache antigo do navegador/CDN.
+  const fileName = `slide-${String(slide.index).padStart(2, '0')}-${Date.now()}.png`;
+  const novaUrl = await supabase.uploadSlide(jobId, fileName, pngBuffer);
+
+  const slideAtualizado = await supabase.updatePostSlide(jobId, slide.index, { imageUrl: novaUrl });
+  return slideAtualizado;
+}
+
+router.post('/biblioteca/:jobId/slide/:index/upload', upload.single('imagem'), async (req, res) => {
+  if (!precisaEstarConfigurado(res)) return;
+
+  try {
+    if (!req.file) {
+      return res.status(400).json({ ok: false, error: 'Nenhuma imagem foi enviada.' });
+    }
+
+    const post = await supabase.getPost(req.params.jobId);
+    const slideIndex = Number(req.params.index);
+    const slide = post.slides.find((s) => s.index === slideIndex);
+    if (!slide) {
+      return res.status(404).json({ ok: false, error: 'Slide não encontrado.' });
+    }
+
+    const slideAtualizado = await renderizarESalvarSlide({
+      jobId: req.params.jobId,
+      slide,
+      photoBuffer: req.file.buffer,
+    });
+
+    res.json({ ok: true, slide: slideAtualizado });
+  } catch (err) {
+    console.error('Erro ao trocar a imagem do slide:', err);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+router.post('/biblioteca/:jobId/slide/:index/regenerate', async (req, res) => {
+  if (!precisaEstarConfigurado(res)) return;
+
+  try {
+    const post = await supabase.getPost(req.params.jobId);
+    const slideIndex = Number(req.params.index);
+    const slide = post.slides.find((s) => s.index === slideIndex);
+    if (!slide) {
+      return res.status(404).json({ ok: false, error: 'Slide não encontrado.' });
+    }
+    if (!slide.photo_prompt) {
+      return res.status(400).json({
+        ok: false,
+        error: 'Este slide não tem uma descrição de foto gerada por IA pra regenerar (provavelmente é um slide com foto real, que só pode ser trocado por upload).',
+      });
+    }
+
+    const photoBuffer = await generatePhoto(slide.photo_prompt);
+    const slideAtualizado = await renderizarESalvarSlide({
+      jobId: req.params.jobId,
+      slide,
+      photoBuffer,
+    });
+
+    res.json({ ok: true, slide: slideAtualizado });
+  } catch (err) {
+    console.error('Erro ao regenerar a imagem do slide:', err);
+    res.status(500).json({ ok: false, error: err.message });
   }
 });
 

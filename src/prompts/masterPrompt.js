@@ -131,6 +131,22 @@ Regras técnicas do SVG:
 - Nunca deixe texto encostar nas bordas: margem mínima de 80px nas laterais.
 - O @Rachel_Patrocinio fica sempre a ~70px do topo.
 - A tagline do rodapé fica sempre a ~90px da base.
+
+Tamanhos de fonte (OBRIGATÓRIO — tela de referência 1080x1350, não use valores menores que estes):
+- Handle "@Rachel_Patrocinio" (Montserrat bold): font-size 26-28px.
+- Corpo de texto / texto de apoio / contexto (Montserrat, com negrito cirúrgico embutido):
+  font-size 44-50px, line-height via dy="1.3em". Este é o texto mais comum do slide
+  (parágrafos de contextualização, interpretação, desenvolvimento) — ele precisa ser
+  grande e fácil de ler no celular, nunca um corpo "de legenda".
+- Ideia central / frase de impacto (Gallient, itálica/serifada — o "peso emocional" do
+  slide): font-size 56-64px, dy="1.25em". Em slides do Padrão C (post-frase), pode chegar
+  a 68-76px por ser o único elemento textual do slide.
+- Tagline fixa do rodapé (Montserrat, com 1-2 palavras em negrito): font-size 34-38px.
+- Atribuição de citação ("| Nome do Autor", Padrão C): font-size 30-34px.
+Nunca reduza esses tamanhos para "caber" mais texto — em vez disso, quebre o conteúdo em
+mais linhas (<tspan>) ou, se necessário, em mais slides. O objetivo é que o texto tenha
+presença forte e leitura confortável em tela de celular, como nas referências de posts
+já publicados.
 `;
 
 module.exports = { MASTER_SYSTEM_PROMPT };
