@@ -6,12 +6,30 @@ const FONTS_DIR = path.join(__dirname, '..', '..', 'fonts');
 
 // Carrega todos os arquivos .ttf/.otf da pasta /fonts automaticamente.
 // Coloque ali os arquivos da Gallient e da Montserrat (veja fonts/README.md).
+let _loggedFonts = false;
+
 function loadFontFiles() {
-  if (!fs.existsSync(FONTS_DIR)) return [];
-  return fs
+  if (!fs.existsSync(FONTS_DIR)) {
+    if (!_loggedFonts) {
+      console.warn(`[fonts] Pasta de fontes não encontrada em ${FONTS_DIR} — usando só fontes do sistema (Gallient/Montserrat vão sair erradas).`);
+      _loggedFonts = true;
+    }
+    return [];
+  }
+  const files = fs
     .readdirSync(FONTS_DIR)
-    .filter((f) => f.toLowerCase().endsWith('.ttf') || f.toLowerCase().endsWith('.otf'))
-    .map((f) => path.join(FONTS_DIR, f));
+    .filter((f) => f.toLowerCase().endsWith('.ttf') || f.toLowerCase().endsWith('.otf'));
+
+  if (!_loggedFonts) {
+    console.log(`[fonts] Arquivos de fonte encontrados em ${FONTS_DIR}:`, files.length ? files : '(nenhum)');
+    const temGallient = files.some((f) => f.toLowerCase().includes('gallient'));
+    const temMontserrat = files.some((f) => f.toLowerCase().includes('montserrat'));
+    if (!temGallient) console.warn('[fonts] ATENÇÃO: nenhum arquivo da Gallient encontrado na pasta fonts/ — os títulos vão renderizar com fonte do sistema, não a serifada da Rachel.');
+    if (!temMontserrat) console.warn('[fonts] ATENÇÃO: nenhum arquivo da Montserrat encontrado na pasta fonts/ — o corpo do texto vai renderizar com fonte do sistema.');
+    _loggedFonts = true;
+  }
+
+  return files.map((f) => path.join(FONTS_DIR, f));
 }
 
 /**

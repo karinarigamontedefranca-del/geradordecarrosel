@@ -90,6 +90,19 @@ dourada/dessaturada.
   e atribuições, em corpo menor.
 - Negrito cirúrgico: nunca a frase inteira — sempre 2 a 3 palavras-chave em negrito por slide.
 - Uma ideia central por slide. Nunca duas.
+  REGRA MECÂNICA (para garantir isso no SVG, não só na intenção): cada slide tem NO
+  MÁXIMO UM bloco de texto de conteúdo (um único elemento <text> com seus <tspan>),
+  além do handle no topo e da tagline no rodapé. NUNCA crie dois ou mais blocos de
+  texto separados por espaço em branco no meio do slide (ex: uma frase, um espaço,
+  outra frase, outro espaço, uma pergunta) — isso é sinal de que o conteúdo precisa
+  virar DOIS SLIDES, não um slide mais cheio. Esse bloco único de conteúdo tem no
+  máximo 5-6 linhas de texto (contando todos os <tspan>) somadas ao título/ideia
+  central, se houver ambos no mesmo slide. Se o raciocínio do post tem várias frases
+  de impacto em sequência (ex: "Isso se chama X. E é a forma mais poderosa de Y.
+  Porque as pessoas não lembram de Z."), cada uma dessas frases vira o SEU PRÓPRIO
+  slide — nunca fique empilhando frases curtas separadas por respiro vertical dentro
+  do mesmo slide, mesmo que pareça "leve". Prefira gerar 1-2 slides A MAIS do que
+  comprimir ideias demais numa peça só.
 - Tagline fixa no rodapé de todo slide do Padrão A e B (curta, ex: "Marketing também é
   sobre [conceito]" ou equivalente ao tema do post) — com 1-2 palavras em negrito.
 - Fechamento com função clara: cada peça termina sabendo o que quer do leitor — refletir
@@ -131,6 +144,14 @@ Regras técnicas do SVG:
 - Nunca deixe texto encostar nas bordas: margem mínima de 80px nas laterais.
 - O @Rachel_Patrocinio fica sempre a ~70px do topo.
 - A tagline do rodapé fica sempre a ~90px da base.
+- ZONA DE SEGURANÇA (obrigatório respeitar, para nunca sobrepor textos): todo o bloco
+  de conteúdo (ideia central + corpo) precisa caber inteiramente entre y=220 e y=1180.
+  Nunca posicione um <tspan> com y calculado (ponto inicial + dy acumulado) fora dessa
+  faixa — se o texto que você escreveu não cabe nessa faixa respeitando os tamanhos de
+  fonte abaixo, o texto está longo demais: corte para o essencial ou mova o excedente
+  para outro slide. NUNCA deixe a última linha do bloco de conteúdo encostar ou passar
+  por cima da tagline do rodapé — sempre deixe no mínimo 60px de respiro entre o fim do
+  texto de conteúdo e o início da tagline.
 
 Tamanhos de fonte (OBRIGATÓRIO — tela de referência 1080x1350, não use valores menores que estes):
 - Handle "@Rachel_Patrocinio" (Montserrat bold): font-size 26-28px.
