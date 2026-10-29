@@ -41,6 +41,39 @@
         <label for="tema">Já tenho uma ideia em mente</label>
         <input type="text" id="tema" placeholder="Ex: novo anúncio da Havaianas com a seleção" />
 
+        <div class="divider"><span>opcional</span></div>
+
+        <!-- Inspirar-se em um post de referência -->
+        <div class="ref" id="refBloco">
+          <label for="refArquivos">Inspirar-se em um post que você gostou</label>
+          <p class="hint">
+            Envie o PDF ou os prints do carrossel. A IA lê a estrutura e o estilo e cria um post novo,
+            com outro assunto e texto 100% original — nada é copiado.
+          </p>
+
+          <input type="file" id="refArquivos" accept=".pdf,application/pdf,image/png,image/jpeg,image/webp" multiple hidden />
+          <button id="btnEscolherRef" class="btn btn--ghost" type="button">Anexar PDF ou imagens</button>
+
+          <ul id="refLista" class="ref__files hidden"></ul>
+
+          <button id="btnAnalisarRef" class="btn btn--ghost hidden" type="button">Analisar referência</button>
+
+          <div id="refLoading" class="loading hidden">
+            <p>Lendo o post de referência... leva cerca de 15 segundos.</p>
+          </div>
+
+          <div id="refResultado" class="ref__card hidden">
+            <div class="ref__card-head">
+              <strong>O que li na referência</strong>
+              <button id="btnRemoverRef" class="btn btn--text" type="button">Remover referência</button>
+            </div>
+            <dl id="refDetalhes" class="ref__details"></dl>
+            <p class="ref__sub">Ideias de assunto diferentes do original (clique para usar):</p>
+            <div id="refIdeias" class="suggestions"></div>
+            <p id="refCusto" class="hint"></p>
+          </div>
+        </div>
+
         <button id="btnGerar" class="btn btn--primary">Gerar post</button>
       </section>
 

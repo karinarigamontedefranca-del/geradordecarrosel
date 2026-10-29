@@ -60,6 +60,14 @@ SUPABASE_SERVICE_KEY=...
 Pronto — a partir do próximo post gerado, tudo fica salvo permanentemente e
 aparece na página **Biblioteca** (link no topo do gerador).
 
+## Inspirar-se em um post de referência (novo)
+
+Na etapa "Tema" há o bloco **"Inspirar-se em um post que você gostou"**: envie um PDF (até 20 páginas) ou prints (PNG/JPG/WEBP, até 10 arquivos de 20 MB). A IA lê só a **estrutura e o estilo** (nº de slides, abertura, ritmo, layout, tom, fechamento) e o post novo usa isso com **outro assunto e texto 100% original**. A identidade da Rachel (fontes, cores, regras do sistema) sempre prevalece sobre a referência.
+
+- Rota: `POST /api/referencia/analisar` (campo `arquivos`). A geração recebe a análise em `referencia` no `POST /api/generate`.
+- Custo: ~US$ 0,03–0,10 por leitura (PDF de ~8 páginas ≈ US$ 0,06 com Sonnet). Aparece no site e no log do servidor (`[uso] ...`).
+- Variável opcional `ANALYSIS_MODEL=claude-haiku-4-5-20251001` deixa a leitura ~3x mais barata.
+
 ## Como rodar (primeiro teste, no seu computador)
 
 ### 1. Pré-requisitos

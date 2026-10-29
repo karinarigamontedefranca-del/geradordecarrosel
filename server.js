@@ -5,6 +5,7 @@ const fs = require('fs');
 
 const suggestionsRoute = require('./src/routes/suggestions');
 const generateRoute = require('./src/routes/generate');
+const referenciaRoute = require('./src/routes/referencia');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -19,6 +20,7 @@ app.use('/fonts', express.static(path.join(__dirname, 'fonts')));
 
 app.use('/api', suggestionsRoute);
 app.use('/api', generateRoute);
+app.use('/api', referenciaRoute);
 
 app.get('/api/health', (req, res) => {
   res.json({

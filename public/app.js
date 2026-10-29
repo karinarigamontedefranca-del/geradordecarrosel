@@ -5,6 +5,8 @@ const state = {
   pattern: null,
   autoCaption: '',
   captionMode: 'auto', // 'auto' | 'manual'
+  refFiles: [], // arquivos da referência ainda não enviados
+  referencia: null, // análise devolvida por /api/referencia/analisar
 };
 
 const els = {
@@ -19,6 +21,16 @@ const els = {
   listaSugestoes: document.getElementById('listaSugestoes'),
   temaInput: document.getElementById('tema'),
   btnGerar: document.getElementById('btnGerar'),
+  refArquivos: document.getElementById('refArquivos'),
+  btnEscolherRef: document.getElementById('btnEscolherRef'),
+  refLista: document.getElementById('refLista'),
+  btnAnalisarRef: document.getElementById('btnAnalisarRef'),
+  refLoading: document.getElementById('refLoading'),
+  refResultado: document.getElementById('refResultado'),
+  refDetalhes: document.getElementById('refDetalhes'),
+  refIdeias: document.getElementById('refIdeias'),
+  refCusto: document.getElementById('refCusto'),
+  btnRemoverRef: document.getElementById('btnRemoverRef'),
   loadingPost: document.getElementById('loadingPost'),
   padraoInfo: document.getElementById('padraoInfo'),
   slidesGrid: document.getElementById('slides'),
@@ -99,11 +111,154 @@ els.btnSugestoes.addEventListener('click', async () => {
   }
 });
 
+// ---------- ETAPA 1: REFERÊNCIA DE INSPIRAÇÃO (opcional) ----------
+
+const REF_MAX_ARQUIVOS = 10;
+const REF_MAX_BYTES = 20 * 1024 * 1024;
+
+function formatarTamanho(bytes) {
+  return bytes >= 1024 * 1024
+    ? (bytes / (1024 * 1024)).toFixed(1) + ' MB'
+    : Math.max(1, Math.round(bytes / 1024)) + ' KB';
+}
+
+function renderRefArquivos() {
+  els.refLista.innerHTML = '';
+  state.refFiles.forEach((file, i) => {
+    const li = document.createElement('li');
+    const nome = document.createElement('span');
+    nome.className = 'ref__file-name';
+    nome.textContent = `${file.name} (${formatarTamanho(file.size)})`;
+    const remover = document.createElement('button');
+    remover.type = 'button';
+    remover.setAttribute('aria-label', 'Remover ' + file.name);
+    remover.textContent = '×';
+    remover.addEventListener('click', () => {
+      state.refFiles.splice(i, 1);
+      state.referencia = null;
+      renderRefArquivos();
+      renderAnalise();
+    });
+    li.append(nome, remover);
+    els.refLista.appendChild(li);
+  });
+  const temArquivos = state.refFiles.length > 0;
+  els.refLista.classList.toggle('hidden', !temArquivos);
+  els.btnAnalisarRef.classList.toggle('hidden', !temArquivos || Boolean(state.referencia));
+  els.btnEscolherRef.textContent = temArquivos ? 'Trocar / adicionar arquivos' : 'Anexar PDF ou imagens';
+}
+
+function linhaDetalhe(titulo, texto) {
+  if (!texto) return;
+  const dt = document.createElement('dt');
+  dt.textContent = titulo;
+  const dd = document.createElement('dd');
+  dd.textContent = texto;
+  els.refDetalhes.append(dt, dd);
+}
+
+// Tudo que vem da IA entra na tela com textContent (nunca innerHTML).
+function renderAnalise(custo) {
+  const a = state.referencia;
+  els.refResultado.classList.toggle('hidden', !a);
+  els.refDetalhes.innerHTML = '';
+  els.refIdeias.innerHTML = '';
+  els.refCusto.textContent = '';
+  if (!a) return;
+
+  linhaDetalhe('Formato', a.numero_de_slides ? `${a.resumo_formato} (${a.numero_de_slides} slides)` : a.resumo_formato);
+  linhaDetalhe('Abertura', a.abertura);
+  linhaDetalhe('Ritmo e estrutura', a.ritmo_e_estrutura);
+  linhaDetalhe('Visual', a.layout_visual);
+  linhaDetalhe('Tom', a.tom_de_voz);
+  linhaDetalhe('Fechamento', a.fechamento);
+  linhaDetalhe('Assunto do original (não será repetido)', a.assunto_do_original);
+
+  a.ideias_de_assunto_diferentes.forEach((ideia) => {
+    const item = document.createElement('div');
+    item.className = 'suggestion-item';
+    item.textContent = ideia.titulo;
+    const gancho = document.createElement('span');
+    gancho.className = 'gancho';
+    gancho.textContent = ideia.gancho_branding;
+    item.appendChild(gancho);
+    item.addEventListener('click', () => {
+      els.temaInput.value = ideia.titulo;
+      els.temaInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+    els.refIdeias.appendChild(item);
+  });
+
+  if (typeof custo === 'number') {
+    els.refCusto.textContent = `Custo estimado desta leitura: ~US$ ${custo.toFixed(3).replace('.', ',')}`;
+  }
+}
+
+els.btnEscolherRef.addEventListener('click', () => els.refArquivos.click());
+
+els.refArquivos.addEventListener('change', () => {
+  esconderErro();
+  const novos = Array.from(els.refArquivos.files);
+  els.refArquivos.value = ''; // permite escolher o mesmo arquivo de novo depois
+  const todos = state.refFiles.concat(novos);
+
+  if (todos.length > REF_MAX_ARQUIVOS) {
+    mostrarErro(`Envie no máximo ${REF_MAX_ARQUIVOS} arquivos.`);
+    return;
+  }
+  const grande = todos.find((f) => f.size > REF_MAX_BYTES);
+  if (grande) {
+    mostrarErro(`"${grande.name}" passa de 20 MB. Envie um arquivo menor.`);
+    return;
+  }
+  state.refFiles = todos;
+  state.referencia = null; // arquivos mudaram: a análise anterior não vale mais
+  renderRefArquivos();
+  renderAnalise();
+});
+
+async function analisarReferencia() {
+  esconderErro();
+  els.btnAnalisarRef.classList.add('hidden');
+  els.refLoading.classList.remove('hidden');
+  try {
+    const form = new FormData();
+    state.refFiles.forEach((f) => form.append('arquivos', f));
+    const res = await fetch('/api/referencia/analisar', { method: 'POST', body: form });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error);
+    state.referencia = data.analise;
+    renderAnalise(data.custo_estimado_usd);
+    return true;
+  } catch (err) {
+    mostrarErro('Não consegui ler a referência: ' + err.message);
+    return false;
+  } finally {
+    els.refLoading.classList.add('hidden');
+    renderRefArquivos();
+  }
+}
+
+els.btnAnalisarRef.addEventListener('click', analisarReferencia);
+
+els.btnRemoverRef.addEventListener('click', () => {
+  state.refFiles = [];
+  state.referencia = null;
+  renderRefArquivos();
+  renderAnalise();
+});
+
 els.btnGerar.addEventListener('click', async () => {
   const tema = els.temaInput.value.trim();
   if (!tema) {
     mostrarErro('Digite ou escolha um tema antes de gerar.');
     return;
+  }
+
+  // Anexou arquivos mas não clicou em "Analisar"? Faz a leitura agora.
+  if (state.refFiles.length > 0 && !state.referencia) {
+    const ok = await analisarReferencia();
+    if (!ok) return;
   }
 
   unlockStage(2);
@@ -117,7 +272,7 @@ els.btnGerar.addEventListener('click', async () => {
     const res = await fetch('/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tema }),
+      body: JSON.stringify({ tema, referencia: state.referencia }),
     });
     const data = await res.json();
     if (!data.ok) throw new Error(data.error);
@@ -126,7 +281,8 @@ els.btnGerar.addEventListener('click', async () => {
     state.pattern = data.pattern;
     state.autoCaption = data.caption || '';
 
-    els.padraoInfo.textContent = `Formato: Padrão ${data.pattern}`;
+    els.padraoInfo.textContent =
+      `Formato: Padrão ${data.pattern}` + (state.referencia ? ' · inspirado na sua referência' : '');
     els.slidesGrid.innerHTML = '';
     data.slides.forEach((slide) => {
       const wrapper = document.createElement('div');
@@ -214,6 +370,11 @@ els.btnNovoPost.addEventListener('click', () => {
   state.pattern = null;
   state.autoCaption = '';
   state.captionMode = 'auto';
+
+  state.refFiles = [];
+  state.referencia = null;
+  renderRefArquivos();
+  renderAnalise();
 
   els.temaInput.value = '';
   els.listaSugestoes.innerHTML = '';

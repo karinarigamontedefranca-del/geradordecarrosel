@@ -81,12 +81,13 @@ async function getSlideFiles(jobId) {
 
 router.post('/generate', async (req, res) => {
   try {
-    const { tema } = req.body;
+    const { tema, referencia } = req.body;
     if (!tema || !tema.trim()) {
       return res.status(400).json({ ok: false, error: 'Informe um tema para gerar o carrossel.' });
     }
 
-    const carousel = await generateCarousel(tema);
+    // "referencia" (opcional) é a análise de um post que a Rachel gostou — vem de /api/referencia/analisar.
+    const carousel = await generateCarousel(tema, referencia);
 
     const jobId = `carrossel-${Date.now()}`;
     const jobDir = path.join(OUTPUT_DIR, jobId);
