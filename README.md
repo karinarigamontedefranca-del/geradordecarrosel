@@ -62,7 +62,7 @@ aparece na página **Biblioteca** (link no topo do gerador).
 
 ## Inspirar-se em um post de referência (novo)
 
-Na etapa "Tema" há o bloco **"Inspirar-se em um post que você gostou"**: envie um PDF (até 20 páginas) ou prints (PNG/JPG/WEBP, até 10 arquivos de 20 MB). A IA lê só a **estrutura e o estilo** (nº de slides, abertura, ritmo, layout, tom, fechamento) e o post novo usa isso com **outro assunto e texto 100% original**. A identidade da Rachel (fontes, cores, regras do sistema) sempre prevalece sobre a referência.
+Na etapa "Tema" há o bloco **"Inspirar-se em um post que você gostou"**: envie um PDF (até 20 páginas) ou prints (PNG/JPG/WEBP, até 10 arquivos de 20 MB). Há dois modos: **Mesmo assunto, texto novo** (padrão: mesmo tema, ideia central e pontos do original, reescritos do zero, sem copiar frases) e **Só o formato, assunto diferente** (aproveita só estrutura e estilo). No modo padrão o campo de tema pode ficar vazio. A identidade da Rachel (fontes, cores, regras do sistema) sempre prevalece sobre a referência.
 
 - Rota: `POST /api/referencia/analisar` (campo `arquivos`). A geração recebe a análise em `referencia` no `POST /api/generate`.
 - Custo: ~US$ 0,03–0,10 por leitura (PDF de ~8 páginas ≈ US$ 0,06 com Sonnet). Aparece no site e no log do servidor (`[uso] ...`).

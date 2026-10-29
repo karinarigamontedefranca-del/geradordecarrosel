@@ -81,13 +81,18 @@ async function getSlideFiles(jobId) {
 
 router.post('/generate', async (req, res) => {
   try {
-    const { tema, referencia } = req.body;
+    const { referencia, modo } = req.body;
+    let { tema } = req.body;
+    // Com referência no modo "mesmo assunto", o tema pode ficar vazio: usamos o assunto do post lido.
+    if ((!tema || !tema.trim()) && referencia && modo !== 'diferente' && typeof referencia.assunto_do_original === 'string') {
+      tema = referencia.assunto_do_original.slice(0, 200);
+    }
     if (!tema || !tema.trim()) {
       return res.status(400).json({ ok: false, error: 'Informe um tema para gerar o carrossel.' });
     }
 
     // "referencia" (opcional) é a análise de um post que a Rachel gostou — vem de /api/referencia/analisar.
-    const carousel = await generateCarousel(tema, referencia);
+    const carousel = await generateCarousel(tema, referencia, modo);
 
     const jobId = `carrossel-${Date.now()}`;
     const jobDir = path.join(OUTPUT_DIR, jobId);

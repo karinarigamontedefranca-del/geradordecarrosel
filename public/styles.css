@@ -554,3 +554,6 @@ input[type="text"]:focus, textarea:focus, .btn:focus-visible, .chip:focus-visibl
   .tracker__step { font-size: 12px; }
   .tracker__rule { width: 14px; margin: 0 6px; }
 }
+
+.ref__modo { border: 0; padding: 0; margin: 0 0 12px; display: flex; flex-direction: column; gap: 6px; font-size: 0.95rem; }
+.ref__modo label { font-weight: 500; cursor: pointer; display: flex; gap: 8px; align-items: center; }

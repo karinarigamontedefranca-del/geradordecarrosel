@@ -172,7 +172,9 @@ function renderAnalise(custo) {
   linhaDetalhe('Visual', a.layout_visual);
   linhaDetalhe('Tom', a.tom_de_voz);
   linhaDetalhe('Fechamento', a.fechamento);
-  linhaDetalhe('Assunto do original (não será repetido)', a.assunto_do_original);
+  linhaDetalhe('Assunto do original', a.assunto_do_original);
+  linhaDetalhe('Ideia central', a.ideia_central_do_original);
+  if (a.pontos_principais && a.pontos_principais.length) linhaDetalhe('Pontos que o post aborda', a.pontos_principais.join(' • '));
 
   a.ideias_de_assunto_diferentes.forEach((ideia) => {
     const item = document.createElement('div');
@@ -250,7 +252,9 @@ els.btnRemoverRef.addEventListener('click', () => {
 
 els.btnGerar.addEventListener('click', async () => {
   const tema = els.temaInput.value.trim();
-  if (!tema) {
+  const modo = (document.querySelector('input[name="refModo"]:checked') || {}).value || 'mesmo';
+  // No modo "mesmo assunto" o tema é opcional quando há referência (usamos o assunto do post lido).
+  if (!tema && !(state.refFiles.length > 0 && modo === 'mesmo')) {
     mostrarErro('Digite ou escolha um tema antes de gerar.');
     return;
   }
@@ -272,7 +276,7 @@ els.btnGerar.addEventListener('click', async () => {
     const res = await fetch('/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tema, referencia: state.referencia }),
+      body: JSON.stringify({ tema, referencia: state.referencia, modo }),
     });
     const data = await res.json();
     if (!data.ok) throw new Error(data.error);

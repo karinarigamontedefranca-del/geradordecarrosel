@@ -47,9 +47,12 @@
         <div class="ref" id="refBloco">
           <label for="refArquivos">Inspirar-se em um post que você gostou</label>
           <p class="hint">
-            Envie o PDF ou os prints do carrossel. A IA lê a estrutura e o estilo e cria um post novo,
-            com outro assunto e texto 100% original — nada é copiado.
+            Envie o PDF ou os prints do carrossel. A IA lê o post e cria um novo, com texto 100% original — nada é copiado.
           </p>
+          <fieldset class="ref__modo" id="refModo">
+            <label><input type="radio" name="refModo" value="mesmo" checked /> Mesmo assunto, texto novo</label>
+            <label><input type="radio" name="refModo" value="diferente" /> Só o formato, assunto diferente</label>
+          </fieldset>
 
           <input type="file" id="refArquivos" accept=".pdf,application/pdf,image/png,image/jpeg,image/webp" multiple hidden />
           <button id="btnEscolherRef" class="btn btn--ghost" type="button">Anexar PDF ou imagens</button>
@@ -68,7 +71,7 @@
               <button id="btnRemoverRef" class="btn btn--text" type="button">Remover referência</button>
             </div>
             <dl id="refDetalhes" class="ref__details"></dl>
-            <p class="ref__sub">Ideias de assunto diferentes do original (clique para usar):</p>
+            <p class="ref__sub">Ideias de assunto diferentes do original (use se escolher "assunto diferente"):</p>
             <div id="refIdeias" class="suggestions"></div>
             <p id="refCusto" class="hint"></p>
           </div>
