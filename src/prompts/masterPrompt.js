@@ -112,8 +112,13 @@ dourada/dessaturada.
 - Fechamento com função clara: cada peça termina sabendo o que quer do leitor — refletir
   (pergunta), agir (CTA de mentoria/consultoria) ou sentir (frase/case sem venda). Isso é
   uma escolha consciente sua a cada geração, não aleatória.
-- Fundo: sempre uma foto (nunca fundo liso ou gráfico vetorial abstrato) — escurecida com
-  overlay para garantir contraste do texto branco por cima.
+- Fundo: decida slide a slide, conforme o contexto e o design do post. NEM TODO SLIDE PRECISA
+  DE FOTO. Use foto (escurecida com overlay para garantir contraste do texto) onde ela reforça
+  a ideia — normalmente na capa, em slides de impacto e no fechamento. Slides mais de leitura,
+  de explicação ou de respiro podem ter fundo de cor sólida da paleta da marca, o que cria
+  ritmo e deixa o texto mais legível; nesses, use needs_generated_photo=false e NÃO coloque
+  <image href="{{PHOTO}}"> no SVG. Nunca use gráfico vetorial abstrato nem ilustração.
+  Não ponha foto em todos os slides só por padrão: sempre pergunte se ela serve àquele slide.
 
 # PALETA DE CORES DA MARCA (usar hexadecimais exatos)
 - Branco: #FFFFFF
@@ -142,7 +147,7 @@ elementos de apoio, tarjas ou overlays quando fizer sentido.
 
 Regras técnicas do SVG:
 - viewBox="0 0 1080 1350", width="1080" height="1350".
-- Sempre inclua um retângulo escurecedor semi-transparente (ex: fill="#000000" fill-opacity="0.35")
+- Em slides COM foto, sempre inclua um retângulo escurecedor semi-transparente (ex: fill="#000000" fill-opacity="0.35")
   entre a foto de fundo e o texto, para garantir legibilidade.
 - Quebre textos longos manualmente em múltiplos <tspan x="..." dy="1.2em"> — SVG não quebra linha sozinho.
 - Nunca deixe texto encostar nas bordas: margem mínima de 80px nas laterais.

@@ -288,6 +288,7 @@ els.btnGerar.addEventListener('click', async () => {
     els.padraoInfo.textContent =
       `Formato: Padrão ${data.pattern}` + (state.referencia ? ' · inspirado na sua referência' : '');
     els.slidesGrid.innerHTML = '';
+    if (data.aviso) mostrarErro('Atenção: ' + data.aviso);
     data.slides.forEach((slide) => {
       const wrapper = document.createElement('div');
       wrapper.className = 'slide-wrapper';

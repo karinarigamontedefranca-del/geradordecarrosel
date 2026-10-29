@@ -33,19 +33,47 @@ function placeholderSvgRect() {
   </svg>`;
 }
 
-async function resolvePhotoBuffer(slide) {
-  if (slide.needs_generated_photo && slide.photo_prompt) {
-    try {
-      return await generatePhoto(slide.photo_prompt);
-    } catch (err) {
-      console.warn(`Falha ao gerar foto do slide ${slide.index}, usando fundo neutro:`, err.message);
-      return renderSlideToPng(placeholderSvgRect());
-    }
+// Decide e gera a foto de fundo de um slide. A fonte da verdade é o SVG: se ele
+// tem o marcador {{PHOTO}}, o slide PRECISA de foto — mesmo que a IA tenha
+// esquecido de marcar needs_generated_photo ou de escrever o photo_prompt.
+// Sempre registra no log o que aconteceu, para nunca mais falhar em silêncio.
+async function resolvePhotoBuffer(slide, tema) {
+  const temMarcador = typeof slide.svg === 'string' && slide.svg.includes('{{PHOTO}}');
+  // O DESENHO manda: nem todo slide tem foto. Só geramos foto se o SVG reservou o lugar dela.
+  // (Pedido de foto sem o marcador no SVG = a IA desenhou o slide sem foto; respeitamos e não gastamos a OpenAI.)
+  const querFoto = temMarcador;
+  if (!temMarcador && (slide.needs_generated_photo === true || slide.needs_generated_photo === 'true')) {
+    console.warn(`[foto] slide ${slide.index}: marcado para foto, mas o SVG não tem {{PHOTO}} — mantido sem foto, como desenhado.`);
   }
-  if (slide.needs_real_photo_placeholder) {
-    return renderSlideToPng(placeholderSvgRect());
+  const ehPessoaReal = slide.needs_real_photo_placeholder === true || slide.needs_real_photo_placeholder === 'true';
+
+  if (ehPessoaReal && !slide.photo_prompt) {
+    console.log(`[foto] slide ${slide.index}: foto real de pessoa — fundo neutro para a Rachel inserir depois.`);
+    return { buffer: renderSlideToPng(placeholderSvgRect()), status: 'pessoa_real' };
   }
-  return null;
+
+  if (!querFoto) {
+    console.log(`[foto] slide ${slide.index}: não usa foto de fundo (sem {{PHOTO}} no SVG e sem pedido de foto).`);
+    return { buffer: null, status: 'sem_foto' };
+  }
+
+  // Se a IA não escreveu o prompt da foto, monta um a partir do que existe.
+  const prompt = slide.photo_prompt
+    || slide.photo_description
+    || `Atmospheric, moody background photograph related to: ${tema}. No people, no text.`;
+  if (!slide.photo_prompt) {
+    console.warn(`[foto] slide ${slide.index}: a IA não enviou photo_prompt — usando um prompt de reserva.`);
+  }
+
+  try {
+    console.log(`[foto] slide ${slide.index}: gerando foto na OpenAI...`);
+    const buffer = await generatePhoto(prompt);
+    console.log(`[foto] slide ${slide.index}: foto gerada (${Math.round(buffer.length / 1024)} KB).`);
+    return { buffer, status: 'ok' };
+  } catch (err) {
+    console.warn(`[foto] slide ${slide.index}: FALHA ao gerar foto, usando fundo neutro:`, err.message);
+    return { buffer: renderSlideToPng(placeholderSvgRect()), status: 'falhou', erro: err.message };
+  }
 }
 
 /**
@@ -102,10 +130,13 @@ router.post('/generate', async (req, res) => {
     // IMPORTANTE: aqui só usamos Claude + OpenAI + disco local — nada de
     // Supabase nesse caminho. Assim, mesmo que o Supabase esteja lento, com
     // chave errada, ou fora do ar, o post ainda aparece pra Rachel normalmente.
+    const fotoStatus = {};
     const slidesOut = await Promise.all(
       carousel.slides.map(async (slide) => {
-        const photoBuffer = await resolvePhotoBuffer(slide);
-        const finalSvg = embedPhoto(slide.svg, photoBuffer);
+        const foto = await resolvePhotoBuffer(slide, tema);
+        fotoStatus[slide.index] = foto;
+        const svgBase = slide.svg;
+        const finalSvg = embedPhoto(svgBase, foto.buffer);
         const pngBuffer = renderSlideToPng(finalSvg);
 
         const fileName = `slide-${String(slide.index).padStart(2, '0')}.png`;
@@ -117,7 +148,7 @@ router.post('/generate', async (req, res) => {
           photo_description: slide.photo_description || null,
           // Guardamos o "molde" (SVG original, ainda com {{PHOTO}}) e o prompt
           // usado na foto — sem isso, não dá pra editar a imagem de fundo depois.
-          svg: slide.svg,
+          svg: svgBase,
           photo_prompt: slide.photo_prompt || null,
         };
       })
@@ -131,8 +162,14 @@ router.post('/generate', async (req, res) => {
 
     // Envia a resposta AGORA — o resto (salvar na biblioteca) acontece depois,
     // sem o navegador da Rachel esperar por isso.
+    const falhas = Object.entries(fotoStatus).filter(([, f]) => f.status === 'falhou');
+    const aviso = falhas.length
+      ? `${falhas.length} foto(s) de fundo não foram geradas e ficaram com fundo liso (slides ${falhas.map(([i]) => i).join(', ')}). Motivo: ${falhas[0][1].erro}`
+      : null;
+
     res.json({
       ok: true,
+      aviso,
       jobId,
       pattern: carousel.pattern,
       caption: carousel.caption,
